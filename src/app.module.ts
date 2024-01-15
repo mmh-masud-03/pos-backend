@@ -15,7 +15,7 @@ import { OrdersModule } from './orders/orders.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(env.MONGO_URL),
+    MongooseModule.forRoot(env.MONGO_URL, { dbName: 'POS' }),
     UsersModule,
     CategoriesModule,
     ProductsModule,
