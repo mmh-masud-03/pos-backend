@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { env } from 'process';
-import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
@@ -15,7 +15,9 @@ import { OrdersModule } from './orders/orders.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(env.MONGO_URL, { dbName: 'POS' }),
+    MongooseModule.forRoot(env.MONGO_URL || 'mongodb://localhost:27017/', {
+      dbName: 'POS',
+    }),
     UsersModule,
     CategoriesModule,
     ProductsModule,

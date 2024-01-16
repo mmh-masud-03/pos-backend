@@ -16,8 +16,23 @@ export class OrdersService {
     return await this.orderModel.create(createOrderDto);
   }
 
-  async findAll() {
-    return await this.orderModel.find().exec();
+  async findAll(orderQuery: OrderQuery) {
+    let query = this.orderModel.find();
+
+    // Apply pagination
+    if (orderQuery.page && orderQuery.limit) {
+      query = query
+        .skip((orderQuery.page - 1) * orderQuery.limit)
+        .limit(orderQuery.limit);
+    }
+
+    // Apply population
+    if (orderQuery.populate) {
+      query.populate(orderQuery.populate);
+    }
+
+    const products = await query.exec();
+    return products;
   }
 
   async findOne(id: string) {

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -21,8 +22,8 @@ export class OrdersController {
   }
 
   @Get()
-  async findAll() {
-    return await this.ordersService.findAll();
+  async findAll(@Query() orderQuery: OrderQuery) {
+    return await this.ordersService.findAll(orderQuery);
   }
 
   @Get(':id')

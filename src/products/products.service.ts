@@ -17,7 +17,22 @@ export class ProductsService {
   }
 
   async findAll(productQuery: ProductQuery) {
-    return await this.productModel.find().exec();
+    let query = this.productModel.find();
+
+    // Apply pagination
+    if (productQuery.page && productQuery.limit) {
+      query = query
+        .skip((productQuery.page - 1) * productQuery.limit)
+        .limit(productQuery.limit);
+    }
+
+    // Apply population
+    if (productQuery.populate) {
+      query.populate(productQuery.populate);
+    }
+
+    const products = await query.exec();
+    return products;
   }
 
   async findOne(id: string) {

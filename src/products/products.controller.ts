@@ -23,6 +23,7 @@ export class ProductsController {
 
   @Get()
   async findAll(@Query() productQuery: ProductQuery) {
+    console.log(productQuery);
     return await this.productsService.findAll(productQuery);
   }
 
