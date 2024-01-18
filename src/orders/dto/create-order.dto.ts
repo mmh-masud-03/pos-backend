@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
 } from 'class-validator';
 
@@ -12,6 +13,7 @@ export class CreateOrderDto {
   readonly products: string[];
 
   @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly totalBill: number;
 

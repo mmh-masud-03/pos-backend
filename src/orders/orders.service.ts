@@ -27,12 +27,14 @@ export class OrdersService {
     }
 
     // Apply population
-    if (orderQuery.populate) {
-      query.populate(orderQuery.populate);
+    if (orderQuery.populate && Array.isArray(orderQuery.populate)) {
+      orderQuery.populate.forEach((field) => {
+        query.populate(field);
+      });
     }
 
-    const products = await query.exec();
-    return products;
+    const orders = await query.exec();
+    return orders;
   }
 
   async findOne(id: string) {

@@ -4,7 +4,6 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './entities/category.entity';
 import { Model } from 'mongoose';
-import { ObjectIdDto } from 'src/common/dto/object-id.dto';
 
 @Injectable()
 export class CategoriesService {
