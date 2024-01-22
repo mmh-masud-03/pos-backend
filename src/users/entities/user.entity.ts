@@ -17,7 +17,7 @@ export class User extends mongoose.Document {
   @Prop({ required: true, type: String })
   role: string;
 
-  @Prop({ required: true, default: null, type: String })
+  @Prop({ required: false, default: null, type: String })
   refresh_token: string | null;
 }
 
