@@ -1,12 +1,7 @@
 import { IsNotEmpty, IsPhoneNumber, IsString, Matches } from 'class-validator';
 
-export class CreateUserDto {
+export class TokenDto {
   @IsString()
-  @IsNotEmpty()
-  readonly name: string;
-
-  @IsString()
-  @IsNotEmpty()
   @IsPhoneNumber('BD')
   @Matches(/(^(\+88|0088)?(01){1}[3456789]{1}(\d){8})$/, {
     message: 'Invalid phone number',
@@ -15,13 +10,5 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly password: string;
-
-  @IsString()
-  @IsNotEmpty()
   readonly role: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly refresh_token: string;
 }

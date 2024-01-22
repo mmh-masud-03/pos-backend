@@ -8,9 +8,6 @@ export class User extends mongoose.Document {
   @Prop({ required: true, type: String })
   name: string;
 
-  @Prop({ required: true, type: String })
-  email: string;
-
   @Prop({ required: true, type: String, unique: true })
   phone: string;
 
@@ -19,6 +16,9 @@ export class User extends mongoose.Document {
 
   @Prop({ required: true, type: String })
   role: string;
+
+  @Prop({ required: true, type: String })
+  refresh_token: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

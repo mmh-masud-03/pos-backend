@@ -16,7 +16,7 @@ import { OrdersModule } from './orders/orders.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(env.MONGO_URL || 'mongodb://localhost:27017/', {
-      dbName: 'POS',
+      dbName: 'Pos',
     }),
     UsersModule,
     CategoriesModule,
