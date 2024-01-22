@@ -65,7 +65,7 @@ export class AuthService {
         password: hashedPassword,
         refresh_token: token.refresh_token,
       });
-      return { ...newUser, access_token: token.access_token };
+      return newUser;
     }
 
     if (!user) {
@@ -91,7 +91,7 @@ export class AuthService {
       token.refresh_token,
     );
 
-    return user;
+    return { ...user, access_token: token.access_token };
   }
 
   async logout(phone: string) {

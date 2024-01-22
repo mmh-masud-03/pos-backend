@@ -11,7 +11,7 @@ export class UsersService {
   ) {}
 
   async findAll(userQuery: UserQuery) {
-    let query = this.userModel.find();
+    let query = this.userModel.find({ role: { $ne: 'admin' } });
 
     // Apply pagination
     if (userQuery.page && userQuery.limit) {

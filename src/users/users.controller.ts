@@ -41,7 +41,7 @@ export class UsersController {
 
   @Post('auth/logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Body() phone: string) {
+  async logout(@Body('phone') phone: string) {
     return await this.authService.logout(phone);
   }
 
