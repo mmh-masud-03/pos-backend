@@ -29,10 +29,15 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
+    const token = await this.helperService.getTokens({
+      phone: createUserDto.phone,
+      role: createUserDto.role,
+    });
+
     const newUser = await this.userModel.create({
       ...createUserDto,
       password: hashedPassword,
-      refresh_token: null,
+      refresh_token: token.refresh_token,
     });
 
     return newUser;
