@@ -23,5 +23,5 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly refresh_token: string;
+  readonly refresh_token: string | null;
 }

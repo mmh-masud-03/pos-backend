@@ -18,7 +18,7 @@ export class User extends mongoose.Document {
   role: string;
 
   @Prop({ required: true, type: String })
-  refresh_token: string;
+  refresh_token: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
