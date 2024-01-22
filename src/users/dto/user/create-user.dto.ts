@@ -20,8 +20,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   readonly role: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly refresh_token: string | null;
 }
