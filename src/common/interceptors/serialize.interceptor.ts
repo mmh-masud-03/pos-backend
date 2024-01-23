@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { classToPlain } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 import { Observable, map } from 'rxjs';
 
 export class SerializeInterceptor implements NestInterceptor {
@@ -10,6 +10,6 @@ export class SerializeInterceptor implements NestInterceptor {
   }
 
   private serialize(data: any) {
-    return classToPlain(data);
+    return plainToClass(this.dto, data, { excludeExtraneousValues: true });
   }
 }

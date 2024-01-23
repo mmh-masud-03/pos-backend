@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../entities/user.entity';
 import { Model } from 'mongoose';
@@ -24,20 +29,15 @@ export class AuthService {
     const user = await this.usersService.findByPhone(createUserDto.phone);
 
     if (user.length) {
-      throw new BadRequestException('User already exists');
+      throw new ConflictException('User already exists !');
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const token = await this.helperService.getTokens({
-      phone: createUserDto.phone,
-      role: createUserDto.role,
-    });
-
     const newUser = await this.userModel.create({
       ...createUserDto,
       password: hashedPassword,
-      refresh_token: token.refresh_token,
+      refreshToken: null,
     });
 
     return newUser;
@@ -63,13 +63,20 @@ export class AuthService {
         name: 'Admin',
         role: 'admin',
         password: hashedPassword,
-        refresh_token: token.refresh_token,
+        refreshToken: token.refreshToken,
       });
-      return newUser;
+      return {
+        id: newUser._id,
+        name: newUser.name,
+        phone: newUser.phone,
+        role: newUser.role,
+        refreshToken: newUser.refreshToken,
+        accessToken: token.accessToken,
+      };
     }
 
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw new NotFoundException('User not found !');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -78,7 +85,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('Invalid credentials !');
     }
 
     const token = await this.helperService.getTokens({
@@ -86,19 +93,27 @@ export class AuthService {
       role: user.role,
     });
 
-    await this.helperService.updateRefreshToken(
-      userLoginDto.phone,
-      token.refresh_token,
-    );
+    const updatedUser = await this.userModel
+      .findOneAndUpdate(
+        { phone: userLoginDto.phone },
+        { refreshToken: token.refreshToken },
+      )
+      .exec();
 
-    return { ...user, access_token: token.access_token };
+    return {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      phone: updatedUser.phone,
+      role: updatedUser.role,
+      refreshToken: updatedUser.refreshToken,
+      accessToken: token.accessToken,
+    };
   }
 
   async logout(phone: string) {
-    await this.helperService.updateRefreshToken(phone, null);
-
+    await this.userModel.findOneAndUpdate({ phone }, { refreshToken: null });
     return {
-      message: 'Logout successful',
+      message: 'Logout successful.',
     };
   }
 
@@ -106,7 +121,7 @@ export class AuthService {
     const [user] = await this.usersService.findByPhone(resetPasswordDto.phone);
 
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw new NotFoundException('User not found !');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -115,7 +130,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('Invalid credentials !');
     }
 
     const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
@@ -124,7 +139,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return updatedUser;
+    return {
+      message: 'Password changed successfully.',
+    };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {

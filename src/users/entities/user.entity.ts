@@ -17,8 +17,8 @@ export class User extends mongoose.Document {
   @Prop({ required: true, type: String })
   role: string;
 
-  @Prop({ required: false, default: null, type: String })
-  refresh_token: string | null;
+  @Prop({ required: false, type: String, default: null })
+  refreshToken: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

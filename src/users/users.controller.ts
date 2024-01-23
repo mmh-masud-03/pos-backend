@@ -9,16 +9,20 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { AuthService } from './auth/auth.service';
 import {
   CreateUserDto,
   ForgotPasswordDto,
+  RegisterSerializeDto,
   ResetPasswordDto,
   UpdateUserDto,
   UserLoginDto,
+  loginSerializeDto,
 } from './dto';
+import { UsersService } from './users.service';
+import { AuthService } from './auth/auth.service';
+import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -27,12 +31,14 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
+  @UseInterceptors(new SerializeInterceptor(RegisterSerializeDto))
   @Post('auth/register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
   }
 
+  @UseInterceptors(new SerializeInterceptor(loginSerializeDto))
   @Post('auth/login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() userLoginDto: UserLoginDto) {
@@ -41,7 +47,7 @@ export class UsersController {
 
   @Post('auth/logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Body('phone') phone: string) {
+  async logout(@Body() phone: string) {
     return await this.authService.logout(phone);
   }
 
