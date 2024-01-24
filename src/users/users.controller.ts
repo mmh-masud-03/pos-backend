@@ -18,7 +18,8 @@ import {
   ResetPasswordDto,
   UpdateUserDto,
   UserLoginDto,
-  loginSerializeDto,
+  LoginSerializeDto,
+  UserSerializeDto,
 } from './dto';
 import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
@@ -38,7 +39,7 @@ export class UsersController {
     return await this.authService.register(createUserDto);
   }
 
-  @UseInterceptors(new SerializeInterceptor(loginSerializeDto))
+  @UseInterceptors(new SerializeInterceptor(LoginSerializeDto))
   @Post('auth/login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() userLoginDto: UserLoginDto) {
@@ -62,21 +63,25 @@ export class UsersController {
     return await this.authService.forgotPassword(forgotPasswordDto);
   }
 
+  @UseInterceptors(new SerializeInterceptor(UserSerializeDto))
   @Get()
   async findAll(@Query() userQuery: UserQuery) {
     return await this.usersService.findAll(userQuery);
   }
 
+  @UseInterceptors(new SerializeInterceptor(UserSerializeDto))
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.usersService.findOne(id);
   }
 
+  @UseInterceptors(new SerializeInterceptor(UserSerializeDto))
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(id, updateUserDto);
   }
 
+  @UseInterceptors(new SerializeInterceptor(UserSerializeDto))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.usersService.remove(id);

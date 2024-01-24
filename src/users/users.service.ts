@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/user/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
@@ -21,6 +21,11 @@ export class UsersService {
     }
 
     const users = await query.exec();
+
+    if (!users.length) {
+      throw new NotFoundException('There is no user !');
+    }
+
     return users;
   }
 
@@ -29,14 +34,34 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return await this.userModel.findById(id).exec();
+    const user = await this.userModel.findById(id).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found !');
+    }
+
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userModel.findByIdAndUpdate(id, updateUserDto).exec();
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+
+    if (!updatedUser) {
+      throw new NotFoundException('User not found !');
+    }
+
+    return updatedUser;
   }
 
   async remove(id: string) {
-    return await this.userModel.findByIdAndDelete(id).exec();
+    const user = await this.userModel.findByIdAndDelete(id).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found !');
+    }
+
+    return user;
   }
 }

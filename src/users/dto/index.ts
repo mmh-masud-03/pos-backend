@@ -10,3 +10,4 @@ export * from './user/update-user.dto';
 // Serialize
 export * from './serialize/register-serialize.dto';
 export * from './serialize/login-serialize.dto';
+export * from './serialize/user-serialize.dto';

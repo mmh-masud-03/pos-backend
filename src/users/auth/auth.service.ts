@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -66,7 +67,7 @@ export class AuthService {
         refreshToken: token.refreshToken,
       });
       return {
-        id: newUser._id,
+        _id: newUser._id,
         name: newUser.name,
         phone: newUser.phone,
         role: newUser.role,
@@ -94,14 +95,17 @@ export class AuthService {
     });
 
     const updatedUser = await this.userModel
-      .findOneAndUpdate(
-        { phone: userLoginDto.phone },
-        { refreshToken: token.refreshToken },
+      .findByIdAndUpdate(
+        user._id,
+        {
+          refreshToken: token.refreshToken,
+        },
+        { new: true },
       )
       .exec();
 
     return {
-      id: updatedUser._id,
+      _id: updatedUser._id,
       name: updatedUser.name,
       phone: updatedUser.phone,
       role: updatedUser.role,
@@ -135,9 +139,17 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
 
-    const updatedUser = await this.usersService.update(user._id, {
-      password: hashedPassword,
-    });
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      user._id,
+      {
+        password: hashedPassword,
+      },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new InternalServerErrorException("Couldn't update password");
+    }
 
     return {
       message: 'Password changed successfully.',

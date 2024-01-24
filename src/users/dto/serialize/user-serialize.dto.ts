@@ -1,7 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
 import { ObjectId } from 'mongoose';
 
-export class LoginSerializeDto {
+export class UserSerializeDto {
   @Expose()
   @Transform((params) => params.obj._id.toString())
   readonly _id: ObjectId;
@@ -16,8 +16,5 @@ export class LoginSerializeDto {
   readonly role: string;
 
   @Expose()
-  readonly refreshToken: string;
-
-  @Expose()
-  readonly accessToken: string;
+  readonly createdAt: Date;
 }
