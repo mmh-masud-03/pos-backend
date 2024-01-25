@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateOrderDto } from './dto/order/create-order.dto';
+import { UpdateOrderDto } from './dto/order/update-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './entities/order.entity';
 import { Model } from 'mongoose';
@@ -13,7 +17,13 @@ export class OrdersService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
-    return await this.orderModel.create(createOrderDto);
+    const order = await this.orderModel.create(createOrderDto);
+
+    if (!order) {
+      throw new BadRequestException('Order could not be created !');
+    }
+
+    return order;
   }
 
   async findAll(orderQuery: OrderQuery) {
@@ -26,26 +36,46 @@ export class OrdersService {
         .limit(orderQuery.limit);
     }
 
-    // Apply population
-    if (orderQuery.populate && Array.isArray(orderQuery.populate)) {
-      orderQuery.populate.forEach((field) => {
-        query.populate(field);
-      });
+    const orders = await query.exec();
+
+    if (orders.length === 0) {
+      throw new NotFoundException('Orders not found !');
     }
 
-    const orders = await query.exec();
     return orders;
   }
 
   async findOne(id: string) {
-    return await this.orderModel.findById(id);
+    const order = await this.orderModel.findById(id);
+
+    if (!order) {
+      throw new NotFoundException('Order not found !');
+    }
+
+    return order;
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto) {
-    return await this.orderModel.findByIdAndUpdate(id, updateOrderDto);
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(
+      id,
+      updateOrderDto,
+      { new: true },
+    );
+
+    if (!updatedOrder) {
+      throw new NotFoundException('Order is not updated !');
+    }
+
+    return updatedOrder;
   }
 
   async remove(id: string) {
-    return await this.orderModel.findByIdAndDelete(id);
+    const deletedOrder = await this.orderModel.findByIdAndDelete(id);
+
+    if (!deletedOrder) {
+      throw new BadRequestException('Order is not deleted !');
+    }
+
+    return deletedOrder;
   }
 }

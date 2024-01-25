@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './entities/product.entity';
 import { Model } from 'mongoose';
+import { CreateProductDto, UpdateProductDto } from './dto';
 
 @Injectable()
 export class ProductsService {
@@ -13,7 +16,23 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDto) {
-    return await this.productModel.create(createProductDto);
+    const products = await this.productModel
+      .find({
+        name: createProductDto.name,
+      })
+      .exec();
+
+    if (products.length > 0) {
+      throw new BadRequestException('Product already exists !');
+    }
+
+    const product = await this.productModel.create(createProductDto);
+
+    if (!product) {
+      throw new NotFoundException('Cannot create product !');
+    }
+
+    return product;
   }
 
   async findAll(productQuery: ProductQuery) {
@@ -26,24 +45,46 @@ export class ProductsService {
         .limit(productQuery.limit);
     }
 
-    // Apply population
-    if (productQuery.populate) {
-      query.populate(productQuery.populate);
+    const products = await query.exec();
+
+    if (products.length === 0) {
+      throw new NotFoundException('Products not found !');
     }
 
-    const products = await query.exec();
     return products;
   }
 
   async findOne(id: string) {
-    return await this.productModel.findById(id).exec();
+    const product = await this.productModel.findById(id).exec();
+
+    if (!product) {
+      throw new NotFoundException('Product not found !');
+    }
+
+    return product;
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    return await this.productModel.findByIdAndUpdate(id, updateProductDto);
+    const updatedProduct = await this.productModel.findByIdAndUpdate(
+      id,
+      updateProductDto,
+      { new: true },
+    );
+
+    if (!updatedProduct) {
+      throw new BadRequestException('Product is not updated !');
+    }
+
+    return updatedProduct;
   }
 
   async remove(id: string) {
-    return await this.productModel.findByIdAndDelete(id);
+    const deletedProduct = await this.productModel.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      throw new BadRequestException('Product is not deleted !');
+    }
+
+    return deletedProduct;
   }
 }

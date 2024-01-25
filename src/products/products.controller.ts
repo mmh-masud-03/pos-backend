@@ -7,31 +7,35 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { SerializeInterceptor } from 'src/common/interceptors/serialize.interceptor';
+import { CreateProductDto, UpdateProductDto, ProductSerializeDto } from './dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @UseInterceptors(new SerializeInterceptor(ProductSerializeDto))
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
     return await this.productsService.create(createProductDto);
   }
 
+  @UseInterceptors(new SerializeInterceptor(ProductSerializeDto))
   @Get()
   async findAll(@Query() productQuery: ProductQuery) {
-    console.log(productQuery);
     return await this.productsService.findAll(productQuery);
   }
 
+  @UseInterceptors(new SerializeInterceptor(ProductSerializeDto))
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.productsService.findOne(id);
   }
 
+  @UseInterceptors(new SerializeInterceptor(ProductSerializeDto))
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -40,6 +44,7 @@ export class ProductsController {
     return await this.productsService.update(id, updateProductDto);
   }
 
+  @UseInterceptors(new SerializeInterceptor(ProductSerializeDto))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.productsService.remove(id);

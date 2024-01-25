@@ -1,26 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import { Product } from '../../products/entities/product.entity';
+import { Document } from 'mongoose';
 
-@Schema({
-  timestamps: true,
-})
-export class Order extends mongoose.Document {
-  @Prop([
-    { required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-  ])
-  products: [Product];
+class Product {
+  _id: string;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+}
 
-  @Prop({
-    required: true,
-    type: Number,
-  })
+@Schema({ timestamps: true })
+export class Order extends Document {
+  @Prop({ required: true, default: [] })
+  products: Product[];
+
+  @Prop({ required: true, default: 0 })
   totalBill: number;
 
-  @Prop({ required: true, type: String })
+  @Prop({ required: true, default: 'in progress' })
   status: string;
 
-  @Prop({ required: false, default: 0, type: Number })
+  @Prop({ required: true, default: 0 })
   discount: number;
 }
+
 export const OrderSchema = SchemaFactory.createForClass(Order);
