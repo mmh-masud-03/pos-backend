@@ -54,4 +54,12 @@ export class CreateOrderDto {
   @Min(0)
   @Max(100)
   readonly discount: number;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly issuedBy: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly issuedPhone: string;
 }
