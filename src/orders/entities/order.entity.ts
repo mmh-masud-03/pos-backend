@@ -21,6 +21,12 @@ export class Order extends Document {
 
   @Prop({ required: true, default: 0 })
   discount: number;
+
+  @Prop({ required: true })
+  issuedBy: string;
+
+  @Prop({ required: true })
+  issuedPhone: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -33,4 +33,10 @@ export class OrderSerializeDto {
 
   @Expose()
   readonly discount: number;
+
+  @Expose()
+  readonly issuedBy: string;
+
+  @Expose()
+  readonly issuedPhone: string;
 }
